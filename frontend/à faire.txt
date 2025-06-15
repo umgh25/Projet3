@@ -1,0 +1,62 @@
+ Liste des routes à reproduire (Mockoon ➜ Spring Boot)
+📁 /auth
+
+    POST /auth/register : Créer un utilisateur
+
+    POST /auth/login : Authentification utilisateur
+
+    GET /auth/me : Récupérer les infos de l’utilisateur connecté
+
+📁 /rentals
+
+    GET /rentals : Liste de toutes les annonces
+
+    GET /rentals/:id : Détail d’une annonce par ID
+
+    POST /rentals : Créer une annonce
+
+    PUT /rentals/:id : Modifier une annonce
+
+📁 /messages
+
+    POST /messages : Envoyer un message
+
+📁 /user/:id (optionnel, dans Mockoon seulement)
+
+    GET /user/:id : Détail d’un utilisateur
+
+📦 Dépendances Spring Boot nécessaires
+🔐 Sécurité & Authentification
+
+    spring-boot-starter-security
+
+    jjwt ou spring-security-oauth2-jose pour la gestion des tokens JWT
+
+    spring-boot-starter-validation pour valider les entrées utilisateur (ex: @Email, @NotBlank)
+
+🧩 Web & REST
+
+    spring-boot-starter-web : Pour exposer les contrôleurs REST (@RestController)
+
+    spring-boot-starter-data-jpa : Pour interagir avec la base de données via les entités @Entity
+
+    spring-boot-starter-hateoas (optionnel) : Pour enrichir les réponses API REST si besoin
+
+🗃️ Base de données
+
+    spring-boot-starter-data-jpa
+
+    com.h2database:h2 (si base en mémoire pour dev/test)
+
+    Ou mysql-connector-java si base MySQL
+
+🌐 Autres
+
+    springdoc-openapi-ui (facultatif mais utile pour générer automatiquement Swagger UI)
+
+    lombok (facultatif pour simplifier le code avec @Getter, @Setter, etc.)
+
+
+- routes: format de retour
+- ensuite bdd avec entities
+- retourner les routes en statiques au moins
