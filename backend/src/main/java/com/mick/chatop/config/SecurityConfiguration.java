@@ -41,7 +41,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/rentals/image/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2->oauth2.jwt(Customizer.withDefaults()))
                 .build();

@@ -16,8 +16,8 @@ public class UserMapper {
                 userEntity.getId(),
                 userEntity.getEmail(),
                 userEntity.getName(),
-                userEntity.getCreated_at().toString(),
-                userEntity.getUpdated_at().toString()
+                userEntity.getCreated_at(),
+                userEntity.getUpdated_at()
         );
     }
 }
