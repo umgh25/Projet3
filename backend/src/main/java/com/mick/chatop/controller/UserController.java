@@ -2,6 +2,7 @@ package com.mick.chatop.controller;
 
 import com.mick.chatop.dto.LoginRequest;
 import com.mick.chatop.dto.RegisterRequest;
+import com.mick.chatop.dto.UserDto;
 import com.mick.chatop.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,6 @@ public class UserController {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
         try {
-            System.out.println(request);
             return ResponseEntity.ok(userService.register(request));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Échec de l'enregistrement : " + e.getMessage());
@@ -51,7 +51,23 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.getAuthenticatedUser(authentication));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage());
         }
     }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUser(@PathVariable Integer id) {
+        try {
+            UserDto user = userService.getUserById(id);
+            if (user == null) {
+                throw new RuntimeException("Utilisateur inconnu");
+            }
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage());
+        }
+    }
+
 }

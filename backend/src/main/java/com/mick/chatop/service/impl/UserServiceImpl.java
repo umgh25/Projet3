@@ -67,7 +67,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getAuthenticatedUser(Authentication authentication) {
         String email = authentication.getName();
-        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Utilisateur n'existe pas"));
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("L'utilisateur n'existe pas"));
+        return userMapper.toDto(user);
+    }
+
+    @Override
+    public UserDto getUserById(Integer id) {
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("L'utilisateur n'existe pas"));
         return userMapper.toDto(user);
     }
 }

@@ -38,9 +38,17 @@ public class RentalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RentalDto> getRentalById(@PathVariable Integer id) {
-        RentalDto rentalDto = rentalService.getRentalById(id);
-        return rentalDto != null ? ResponseEntity.ok(rentalDto) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> getRentalById(@PathVariable Integer id) {
+        try {
+            RentalDto rental = rentalService.getRentalById(id);
+            if (rental == null) {
+                throw new RuntimeException("Rental introuvable");
+            }
+            return ResponseEntity.ok(rental);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage());
+        }
     }
 
     @PostMapping(
@@ -52,8 +60,7 @@ public class RentalController {
             rentalService.createRental(rentalDto);
             return new ResponseEntity<>(new RentalMessageResponse("Rental created !"), HttpStatus.CREATED);
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Erreur: " + e.getMessage());
         }
     }
@@ -65,9 +72,7 @@ public class RentalController {
             if (!Files.exists(filePath) || !Files.isReadable(filePath)) {
                 return ResponseEntity.notFound().build();
             }
-
             byte[] imageBytes = Files.readAllBytes(filePath);
-
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
                     .body(imageBytes);
@@ -86,7 +91,7 @@ public class RentalController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Erreur: " + e.getMessage());
         }
     }
