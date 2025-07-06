@@ -56,7 +56,6 @@ public class UserServiceImpl implements UserService {
         newUser.setCreated_at(LocalDateTime.now());
         newUser.setUpdated_at(LocalDateTime.now());
         userRepository.save(newUser);
-        System.out.println("nouveau : " + newUser);
         String token = jwtService.generateToken(
                 new UsernamePasswordAuthenticationToken(registerRequest.email(),
                         null,
