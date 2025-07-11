@@ -73,7 +73,7 @@ export class FormComponent implements OnInit {
       name: [rental ? rental.name : '', [Validators.required]],
       surface: [rental ? rental.surface : '', [Validators.required]],
       price: [rental ? rental.price : '', [Validators.required]],
-      description: [rental ? rental.description : '', [Validators.required]],
+      description: [rental ? rental.description : '',  [Validators.required, Validators.maxLength(2000)]]
     });
     if (!this.onUpdate) {
       this.rentalForm.addControl('picture', this.fb.control('', [Validators.required]));

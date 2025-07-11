@@ -82,3 +82,75 @@ En résumé
         Grâce à Maven et au goal spring-boot:run.
 
         En exécutant la commande java -jar.
+
+
+
+
+En résumé
+
+    Pour implémenter une API qui communique avec une base de données, 3 éléments sont essentiels :
+
+        Le starter web qui permettra d’exposer les endpoints.
+
+        Un starter pour gérer la persistance des données (comme Spring Data JPA).
+
+        La dépendance pour le driver de la base de données concernée (par ex. H2 Database ou MySQL Driver).
+
+C’est parti pour la deuxième étape : la configuration et la structuration de l'API !
+
+
+
+En résumé
+
+    Les besoins techniques du projet vont influer sur votre configuration.
+
+    La structure des packages reste le standard : controller / service / repository / model.
+
+    Grâce à Spring Boot, la mise en œuvre de la base de données requiert 0 ligne de configuration, si ce n’est pour activer la console H2.
+
+
+
+En résumé
+
+    Notre entité du model est modélisée, et @Entity est l’annotation obligatoire !
+
+    La communication aux données s’effectue via une classe annotée @Repository.
+
+    La classe annotée @Service se charge des traitements métiers.
+
+    Nos controllers @RestController nous permettent de définir des URL et le code à exécuter quand ces dernières sont requêtées.
+
+Vous connaissez la suite : quelle est la dernière étape ? Les tests et le déploiement ! Allons-y !
+
+
+
+En résumé
+
+    Des tests unitaires sur nos controllers REST sont exécutables grâce à @WebMvcTest.
+
+    Des tests d’intégration sont exécutables grâce à @SpringBootTest et @AutoConfigureMockMvc.
+
+    La procédure de déploiement ne subit aucun impact, c’est toujours la même !
+
+Vous avez terminé cette troisième partie de cours ! Laissez-moi vous adresser quelques mots pour conclure :).
+
+
+
+En résumé
+
+    Pour implémenter une application web qui communique avec une API, 2 éléments sont essentiels :
+
+        Le starter Spring Web qui permettra de renvoyer des pages HTML et communiquer avec l’API.
+
+        Un moteur de template comme Thymeleaf qui permet de formater le HTML.
+
+
+En résumé
+
+    La structure des packages reste le standard : controller/service/repository/model.
+
+    Le fichier application.properties est ma source de propriétés.
+
+    Je peux créer des propriétés et les manipuler dans mon code, notamment grâce à l’annotation @ConfigurationProperties.
+
+Votre configuration est terminée ! Vous êtes prêt pour la phase 3 de chaque projet Spring : écrire le code !
