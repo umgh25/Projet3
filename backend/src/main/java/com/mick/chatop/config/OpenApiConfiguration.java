@@ -21,31 +21,6 @@ public class OpenApiConfiguration {
     @Value("${chatop.openapi.prod-url}")
     private String prodUrl;
 
-/*    @Bean
-    public OpenAPI openAPI() {
-        Server devServer = new Server();
-        devServer.setUrl(devUrl);
-        devServer.setDescription("ChatOp API URL in development environment");
-
-        Server prodServer = new Server();
-        prodServer.setUrl(prodUrl);
-        prodServer.setDescription("ChatOp API URL in production environment");
-
-        Info info = new Info()
-                .title("ChatOp API")
-                .description("ChatOp API is the backend for a rental management application. " +
-                        "It handles user management, rentals, and messages exchanged between users.")
-                .version("1.0");
-
-        SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
-                .in(SecurityScheme.In.HEADER)
-                .name("Bearer")
-                .bearerFormat("JWT")
-                .scheme("Bearer");
-        return new OpenAPI().addSecurityItem(securityScheme).info(info).servers(List.of(devServer, prodServer));
-    }*/
-
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()

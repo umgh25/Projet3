@@ -215,17 +215,18 @@ public class UserController {
                                             @ExampleObject(
                                                     name = "UnauthorizedResponse",
                                                     value = """
-                        {
-                          "error": "UNAUTHORIZED",
-                          "status": 401,
-                          "reason": "Token missing or invalid"
-                        }
-                        """
+                            {
+                              "error": "UNAUTHORIZED",
+                              "status": 401,
+                              "reason": "Token missing or invalid"
+                            }
+                            """
                                             )
                                     }
                             )
                     )
-            })
+            }
+    )
     @GetMapping("/me")
     public ResponseEntity<?> getAuthenticatedUser(Authentication authentication) {
         try {
