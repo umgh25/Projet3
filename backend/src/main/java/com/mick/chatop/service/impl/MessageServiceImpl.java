@@ -36,10 +36,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void createMessage(MessageRequestDto messageRequestDto) {
         UserEntity user = userRepository.findById(messageRequestDto.userId())
-                .orElseThrow(() -> new RuntimeException("Utilisateur inconnu"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         RentalEntity rental = rentalRepository.findById(messageRequestDto.rentalId())
-                .orElseThrow(() -> new RuntimeException("Location inconnue"));
+                .orElseThrow(() -> new RuntimeException("Rental not found"));
 
         MessageEntity messageEntity = messageMapper.toEntity(rental, user, messageRequestDto);
         messageEntity.setCreated_at(LocalDateTime.now());

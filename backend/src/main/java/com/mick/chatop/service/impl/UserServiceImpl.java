@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponse register(RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
-            throw new IllegalArgumentException("Email déjà utilisé");
+            throw new IllegalArgumentException("Email already in use");
         }
 
         String hashedPassword = passwordEncoder.encode(registerRequest.password());
@@ -66,13 +66,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getAuthenticatedUser(Authentication authentication) {
         String email = authentication.getName();
-        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("L'utilisateur n'existe pas"));
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User does not exist"));
         return userMapper.toDto(user);
     }
 
     @Override
     public UserDto getUserById(Integer id) {
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("L'utilisateur n'existe pas"));
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User does not exist"));
         return userMapper.toDto(user);
     }
 }

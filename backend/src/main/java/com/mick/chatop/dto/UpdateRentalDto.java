@@ -9,24 +9,25 @@ import org.springframework.web.multipart.MultipartFile;
 public record UpdateRentalDto(
         Integer id,
 
-        @NotBlank(message = "Le champ nom est obligatoire.")
-        @Size(max = 255, message = "Le nom ne doit pas dépasser 255 caractères.")
+        @NotBlank(message = "The name field is required.")
+        @Size(max = 255, message = "The name must not exceed 255 characters.")
         String name,
 
-        @NotNull(message = "Le champ surface est obligatoire.")
+        @NotNull(message = "The surface field is required.")
         Double surface,
 
-        @NotNull(message = "Le champ prix est obligatoire.")
+        @NotNull(message = "The price field is required.")
         Double price,
 
         MultipartFile picture,
 
-        @NotBlank(message = "Le champ description est obligatoire.")
-        @Size(max = 2000, message = "La description ne doit pas dépasser 2000 caractères.")
+        @NotBlank(message = "The description field is required.")
+        @Size(max = 2000, message = "The description must not exceed 2000 characters.")
         String description,
 
         @JsonProperty("owner_id")
         Integer ownerId
 ) {
 }
+
 

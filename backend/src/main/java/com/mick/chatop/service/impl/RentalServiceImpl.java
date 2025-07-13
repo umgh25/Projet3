@@ -17,11 +17,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -60,7 +62,7 @@ public class RentalServiceImpl implements RentalService {
     public void createRental(NewRentalDto rentalDto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity owner = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non authentifié."));
+                .orElseThrow(() -> new RuntimeException("Unauthenticated user"));
 
         RentalEntity rentalEntity = rentalMapper.toEntity(rentalDto);
         rentalEntity.setOwner(owner);
@@ -68,7 +70,7 @@ public class RentalServiceImpl implements RentalService {
         try {
             rentalEntity.setPicture(getImageUrl(saveFile(rentalDto.picture())));
         } catch (IOException e) {
-            throw new RuntimeException("Erreur lors de l'enregistrement de la photo : " + e.getMessage());
+            throw new RuntimeException("There was a problem with the photo : " + e.getMessage());
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -81,7 +83,7 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public void updateRental(Integer id, UpdateRentalDto updateRentalDto) {
         RentalEntity existingRental = rentalRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Location introuvable."));
+                .orElseThrow(() -> new NoSuchElementException("Rental not found"));
 
         existingRental.setName(updateRentalDto.name());
         existingRental.setSurface(updateRentalDto.surface());
@@ -96,7 +98,7 @@ public class RentalServiceImpl implements RentalService {
                 String savedFilename = saveFile(newPicture);
                 existingRental.setPicture(getImageUrl(savedFilename));
             } catch (IOException e) {
-                throw new RuntimeException("Erreur lors de l'enregistrement de la nouvelle photo : " + e.getMessage());
+                throw new RuntimeException("There was a problem with the new photo : " + e.getMessage());
             }
         }
 
@@ -114,13 +116,13 @@ public class RentalServiceImpl implements RentalService {
         // ✅ Vérification du type MIME
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException("Seuls les fichiers image sont autorisés.");
+            throw new IllegalArgumentException("Only image files are allowed.");
         }
 
         // ✅ Vérification de l'extension
         String originalName = file.getOriginalFilename();
         if (originalName == null || !originalName.matches("(?i).+\\.(jpg|jpeg|png|gif)$")) {
-            throw new IllegalArgumentException("Extension de fichier non autorisée. Autorisées : jpg, jpeg, png, gif.");
+            throw new IllegalArgumentException("File extension not allowed. Allowed : jpg, jpeg, png, gif.");
         }
 
         // ✅ Création du dossier si nécessaire
@@ -146,7 +148,7 @@ public class RentalServiceImpl implements RentalService {
         try {
             Files.deleteIfExists(fileToDelete);
         } catch (IOException e) {
-            System.err.println("Impossible de supprimer l'ancienne photo : " + e.getMessage());
+            System.err.println("Unable to delete old photo : " + e.getMessage());
         }
     }
 }
