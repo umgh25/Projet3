@@ -27,23 +27,23 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-
+    // JWT secret ky pour la signature des tokens
     @Value("${jwt.secret}")
     private String secretKey;
-
+    // Mot de passe encoder pour le hachage des mots de passe
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    // Point d'entrée pour les requêtes non authentifiées
     @Bean
     public AuthenticationEntryPoint apiAuthenticationEntryPoint() {
         return new ApiAuthentificationEntryPoint();
     }
-
+    // Configuration de la sécurité HTTP
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+        // Configuration de la sécurité HTTP
         return http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -65,12 +65,12 @@ public class SecurityConfiguration {
                 .build();
 
     }
-
+    // Configuration du JWT encoder et decoder
     @Bean
     JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey.getBytes()));
     }
-
+    // Configuration du JWT decoder
     @Bean
     JwtDecoder jwtDecoder() {
         SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA512");
@@ -81,3 +81,6 @@ public class SecurityConfiguration {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+
+// Cette classe configure la sécurité de l'application en utilisant Spring Security.
+// Elle définit les règles d'authentification, le point d'entrée pour les requêtes

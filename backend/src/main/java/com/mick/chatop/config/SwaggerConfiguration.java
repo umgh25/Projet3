@@ -15,13 +15,13 @@ import java.util.List;
 
 @Configuration
 public class SwaggerConfiguration {
-
+        // URL de l'API en environnement de développement
     @Value("${chatop.openapi.dev-url}")
     private String devUrl;
-
+        // URL de l'API en environnement de production
     @Value("${chatop.openapi.prod-url}")
     private String prodUrl;
-
+        // Configuration de l'OpenAPI pour Swagger
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -42,3 +42,6 @@ public class SwaggerConfiguration {
                 ;
     }
 }
+// Cette classe configure Swagger pour documenter l'API de l'application ChatOp.
+// Elle définit les informations de base de l'API, les serveurs disponibles et le schéma de sécurité utilisé pour l'authentification.
+// Les URLs de l'API en développement et en production sont injectées via des propriétés Spring
