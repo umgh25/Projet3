@@ -15,33 +15,55 @@ import java.util.List;
 
 @Configuration
 public class SwaggerConfiguration {
-        // URL de l'API en environnement de développement
+
+    /**
+     * URL de l'API pour l'environnement de développement.
+     * Injectée depuis le fichier de configuration (application.properties).
+     */
     @Value("${chatop.openapi.dev-url}")
     private String devUrl;
-        // URL de l'API en environnement de production
+
+    /**
+     * URL de l'API pour l'environnement de production.
+     * Injectée depuis le fichier de configuration (application.properties).
+     */
     @Value("${chatop.openapi.prod-url}")
     private String prodUrl;
-        // Configuration de l'OpenAPI pour Swagger
+
+    /**
+     * Configuration principale de Swagger (OpenAPI).
+     * - Définit les serveurs (dev et prod) pour tester les endpoints.
+     * - Ajoute les informations générales de l’API : titre, description, version.
+     * - Déclare le schéma de sécurité JWT (bearerAuth) pour autoriser les requêtes protégées.
+     *
+     * @return l'objet OpenAPI configuré.
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .servers(List.of(new Server().url(devUrl).description("ChatOp API URL in development environment"),
-                        new Server().url(prodUrl).description("ChatOp API URL in production environment")))
+                .servers(List.of(
+                        new Server().url(devUrl).description("ChatOp API - Environnement de développement"),
+                        new Server().url(prodUrl).description("ChatOp API - Environnement de production")
+                ))
                 .info(new Info()
                         .title("ChatOp API")
-                        .description("ChatOp API is the backend for a rental management application. " +
-                                "It handles user management, rentals, and messages exchanged between users.")
-                        .version("1.0"))
+                        .description("ChatOp API est le backend d'une application de gestion de locations immobilières. "
+                                + "Il prend en charge la gestion des utilisateurs, des locations et des messages échangés entre les utilisateurs.")
+                        .version("1.0")
+                )
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .components(new Components()
-                        .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                .components(new Components().addSecuritySchemes("bearerAuth",
+                        new SecurityScheme()
                                 .name("bearerAuth")
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
-                                .bearerFormat("JWT")))
-                ;
+                                .bearerFormat("JWT")
+                ));
     }
 }
-// Cette classe configure Swagger pour documenter l'API de l'application ChatOp.
-// Elle définit les informations de base de l'API, les serveurs disponibles et le schéma de sécurité utilisé pour l'authentification.
-// Les URLs de l'API en développement et en production sont injectées via des propriétés Spring
+
+/**
+ * Classe de configuration Swagger pour la documentation OpenAPI de l’application ChatOp.
+ * ➜ Fournit une documentation interactive avec les routes, les schémas et la sécurité JWT.
+ * ➜ Facilite les tests de l’API en environnement dev/prod via Swagger UI.
+ */
