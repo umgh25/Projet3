@@ -13,6 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Implémentation du service de gestion des messages.
+ * Cette classe gère la création de messages dans le système.
+ * Ce service permet de créer un nouveau message lié à une location
+ * et un utilisateur dans le système.
+ */
 @Service
 public class MessageServiceImpl implements MessageService {
 
@@ -21,6 +27,14 @@ public class MessageServiceImpl implements MessageService {
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
 
+    /**
+     * Constructeur avec injection des dépendances nécessaires au service.
+     *
+     * @param messageRepository   Repository pour l'entité {@link MessageEntity}.
+     * @param messageMapper       Mapper permettant de transformer les DTO en entités.
+     * @param userRepository      Repository pour l'entité {@link UserEntity}.
+     * @param rentalRepository    Repository pour l'entité {@link RentalEntity}.
+     */
     public MessageServiceImpl(
             MessageRepository messageRepository,
             MessageMapper messageMapper,
@@ -33,6 +47,15 @@ public class MessageServiceImpl implements MessageService {
         this.rentalRepository = rentalRepository;
     }
 
+    /**
+     * Crée un nouveau message à partir des informations fournies dans le DTO.
+     * <p>
+     * Le message est lié à un utilisateur et une location existants. S'il manque l'un des deux,
+     * une exception est levée.
+     *
+     * @param messageRequestDto DTO contenant les informations du message (texte, userId, rentalId).
+     * @throws RuntimeException si l'utilisateur ou la location n'existe pas.
+     */
     @Override
     public void createMessage(MessageRequestDto messageRequestDto) {
         UserEntity user = userRepository.findById(messageRequestDto.userId())
@@ -44,6 +67,7 @@ public class MessageServiceImpl implements MessageService {
         MessageEntity messageEntity = messageMapper.toEntity(rental, user, messageRequestDto);
         messageEntity.setCreated_at(LocalDateTime.now());
         messageEntity.setUpdated_at(LocalDateTime.now());
+
         messageRepository.save(messageEntity);
     }
 }

@@ -22,6 +22,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Contrôleur REST pour la gestion des messages.
+ * 
+ * Fournit une API sécurisée pour permettre à un utilisateur authentifié d’envoyer un message
+ * à propos d’une annonce (rental). Le message est associé à l’annonce et à l’expéditeur.
+ * 
+ *
+ * URL racine :</b> /api/messages
+ */
 @Tag(name = "Messages", description = "Message management APIs")
 @RestController
 @RequestMapping("/api/messages")
@@ -29,11 +38,32 @@ public class MessageController {
 
     private final MessageService messageService;
 
+    /**
+     * Constructeur injectant le service de gestion des messages.
+     *
+     * @param messageService Service métier pour les messages
+     */
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
     }
 
-
+    /**
+     * Crée un nouveau message associé à une annonce.
+     *
+     * Sécurité : Requiert un token JWT valide (bearerAuth)
+     *
+     * Réponses possibles :
+     * 
+     *     200 - Message envoyé avec succès
+     *     400 - Erreur de validation (champ manquant ou invalide)
+     *     401 - Utilisateur non authentifié
+     * 
+     *
+     * @param messageRequestDto     Données du message à créer (corps de la requête)
+     * @param bindingResult         Résultat de la validation du DTO
+     * @param authentication        Contexte d’authentification de Spring Security
+     * @return ResponseEntity contenant un message de succès ou une erreur détaillée
+     */
     @Operation(
             summary = "Create a new message",
             security = @SecurityRequirement(name = "bearerAuth"),

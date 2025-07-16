@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+// Cette classe représente une entité de message dans l'application.
 @Entity
 @Table(name = "messages")
 public class MessageEntity {

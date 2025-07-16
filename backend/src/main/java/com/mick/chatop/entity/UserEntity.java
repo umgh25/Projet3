@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-// This class represents a user entity in the application.
+// Cette classe représente une entité utilisateur dans l'application.
 @Entity
 @Table(name="users")
 public class UserEntity {

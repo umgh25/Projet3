@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-// This class represents a rental entity in the application.
+// Cette classe représente une entité de location dans l'application.
 @Entity
 @Table(name="rentals")
 public class RentalEntity {
