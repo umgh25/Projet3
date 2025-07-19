@@ -16,6 +16,8 @@ export class FormComponent implements OnInit {
 
   public onUpdate: boolean = false;
   public rentalForm: FormGroup | undefined;
+  public pictureError: string | null = null;
+  public descriptionError: string | null = null;
 
   private id: string | undefined;
 
@@ -43,6 +45,9 @@ export class FormComponent implements OnInit {
   }
 
   public submit(): void {
+    if (this.pictureError) {
+      return;
+    }
     const formData = new FormData();
     formData.append('name', this.rentalForm!.get('name')?.value);
     formData.append('surface', this.rentalForm!.get('surface')?.value);
@@ -63,6 +68,23 @@ export class FormComponent implements OnInit {
     }
   }
 
+  onPictureSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      this.pictureError = null;
+      this.rentalForm!.get('picture')?.setValue('');
+      return;
+    }
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      this.pictureError = "Seuls les fichiers jpg, png ou gif sont autorisés.";
+      this.rentalForm!.get('picture')?.setValue('');
+    } else {
+      this.pictureError = null;
+      // ngx-mat-file-input gère déjà la valeur
+    }
+  }
+
   private initForm(rental?: Rental): void {
     console.log(rental);
     console.log(this.sessionService.user!.id);
@@ -78,6 +100,13 @@ export class FormComponent implements OnInit {
     if (!this.onUpdate) {
       this.rentalForm.addControl('picture', this.fb.control('', [Validators.required]));
     }
+    this.rentalForm.get('description')?.valueChanges.subscribe(value => {
+      if (value && value.length > 2000) {
+        this.descriptionError = 'La description ne doit pas dépasser 2000 caractères.';
+      } else {
+        this.descriptionError = null;
+      }
+    });
   }
 
   private exitPage(rentalResponse: RentalResponse): void {
