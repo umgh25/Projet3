@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { LoginRequest } from '../interfaces/loginRequest.interface';
@@ -25,5 +25,13 @@ export class AuthService {
 
   public me(): Observable<User> {
     return this.httpClient.get<User>(`${this.pathService}/me`);
+  }
+
+  public logout(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.httpClient.post<any>(`${this.pathService}/logout`, {}, { headers });
   }
 }

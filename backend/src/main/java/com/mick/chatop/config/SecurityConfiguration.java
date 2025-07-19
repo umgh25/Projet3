@@ -21,6 +21,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import com.mick.chatop.repository.TokenRepository;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.mick.chatop.security.JwtTokenDatabaseFilter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -34,6 +39,18 @@ public class SecurityConfiguration {
      */
     @Value("${jwt.secret}")
     private String secretKey;
+    /**
+     * Repository pour accéder aux tokens JWT stockés dans la base de données.
+     * Utilisé pour valider les tokens lors des requêtes sécurisées.
+     */
+    @Autowired
+    private TokenRepository tokenRepository;
+    /**
+     * Filtre personnalisé pour valider les tokens JWT stockés dans la base de données.
+     * Il est ajouté avant le filtre BearerTokenAuthenticationFilter de Spring Security.
+     */
+    @Autowired
+    private JwtTokenDatabaseFilter jwtTokenDatabaseFilter;
 
     /**
      * Bean pour encoder les mots de passe.
@@ -63,25 +80,27 @@ public class SecurityConfiguration {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/rentals/image/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(apiAuthenticationEntryPoint())
-                )
-                .build();
+        http
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(
+                    "/api/auth/login",
+                    "/api/auth/register",
+                    "/api/rentals/image/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(apiAuthenticationEntryPoint())
+            );
+        // Ajouter le filtre AVANT BearerTokenAuthenticationFilter
+        http.addFilterBefore(jwtTokenDatabaseFilter, BearerTokenAuthenticationFilter.class);
+        return http.build();
     }
 
     /**

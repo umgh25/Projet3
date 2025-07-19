@@ -43,4 +43,11 @@ public interface UserService {
      * @return Un objet {@link UserDto} représentant l'utilisateur correspondant.
      */
     UserDto getUserById(Integer id);
+
+    /**
+     * Invalide le token JWT courant (déconnexion).
+     *
+     * @param token Le token JWT à invalider.
+     */
+    void logout(String token);
 }

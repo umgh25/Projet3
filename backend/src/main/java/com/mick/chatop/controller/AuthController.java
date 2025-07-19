@@ -170,4 +170,32 @@ public class AuthController {
                     .body(new ErrorResponse("UNAUTHORIZED", 401, e.getMessage()));
         }
     }
+
+    /**
+     * Déconnecte l'utilisateur en invalidant le token JWT.
+     * 
+     * @param authorizationHeader l'en-tête d'autorisation contenant le token JWT
+     * @return une réponse indiquant que la déconnexion a réussi, ou une erreur 401 si le token est manquant ou invalide
+     */
+    @Operation(
+            summary = "Logout the current user (invalidate JWT)",
+            security = @SecurityRequirement(name = "bearerAuth"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User logged out successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessResponse.class),
+                                    examples = @ExampleObject(name = "SuccessResponse", value = "{\"message\": \"Logged out successfully\"}"))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(name = "UnauthorizedResponse", value = "{\"error\": \"UNAUTHORIZED\",\"status\":401,\"message\":\"Token missing or invalid\"}")))
+            })
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("UNAUTHORIZED", 401, "Token missing or invalid"));
+        }
+        String token = authorizationHeader.substring(7);
+        userService.logout(token);
+        return ResponseEntity.ok(new SuccessResponse("Logged out successfully"));
+    }
 }
