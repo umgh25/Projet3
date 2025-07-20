@@ -4,11 +4,11 @@
 Chatop API est le backend d'une application de gestion de locations. Elle permet la gestion des utilisateurs, des locations et des messages entre utilisateurs.
 
 ## 🚀 Technologies utilisées
-![Java](https://img.shields.io/badge/Java-21-red?logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-brightgreen?logo=spring&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.5-blue?logo=mysql&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-Security-yellow?logo=jsonwebtokens&logoColor=white)
-![Swagger](https://img.shields.io/badge/Swagger-API-green?logo=swagger&logoColor=white)
+- ![Java](https://img.shields.io/badge/Java-21-red?logo=openjdk&logoColor=white)
+- ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-brightgreen?logo=spring&logoColor=white)
+- ![MySQL](https://img.shields.io/badge/MySQL-8.5-blue?logo=mysql&logoColor=white)
+- ![JWT](https://img.shields.io/badge/JWT-Security-yellow?logo=jsonwebtokens&logoColor=white)
+- ![Swagger](https://img.shields.io/badge/Swagger-API-green?logo=swagger&logoColor=white)
 
 
 ## ⚙️ Installation et configuration
