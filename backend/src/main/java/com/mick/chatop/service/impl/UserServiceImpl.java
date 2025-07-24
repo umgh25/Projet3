@@ -11,6 +11,8 @@ import com.mick.chatop.repository.TokenRepository;
 import com.mick.chatop.repository.UserRepository;
 import com.mick.chatop.security.JwtService;
 import com.mick.chatop.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,12 +27,13 @@ import java.util.Collections;
 
 /**
  * Implémentation du service utilisateur {@link UserService}.
- * 
  * Fournit la logique métier pour l'authentification, l'inscription,
  * et la récupération des informations utilisateur.
  */
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -39,16 +42,12 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final TokenRepository tokenRepository;
 
-    /**
-     * Constructeur avec injection des dépendances.
-     *
-     * @param userRepository         Le repository pour les entités {@link UserEntity}.
-     * @param jwtService             Service de génération de token JWT.
-     * @param authenticationManager  Gestionnaire d'authentification Spring Security.
-     * @param passwordEncoder        Encodeur de mots de passe.
-     * @param userMapper             Mapper entre entités et DTOs utilisateurs.
-     */
-    public UserServiceImpl(UserRepository userRepository, JwtService jwtService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserMapper userMapper, TokenRepository tokenRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           JwtService jwtService,
+                           AuthenticationManager authenticationManager,
+                           PasswordEncoder passwordEncoder,
+                           UserMapper userMapper,
+                           TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -56,38 +55,35 @@ public class UserServiceImpl implements UserService {
         this.userMapper = userMapper;
         this.tokenRepository = tokenRepository;
     }
-
     /**
-     * Authentifie un utilisateur avec email et mot de passe.
+     * Authentifie l'utilisateur avec les informations fournies et génère un token JWT.
+     * Enregistre le token dans la base de données pour une utilisation ultérieure.
      *
-     * @param request Les informations de connexion (email, mot de passe).
-     * @return Une réponse contenant un token JWT.
-     * @throws AuthenticationException si l'authentification échoue.
+     * @param request les informations de connexion de l'utilisateur
+     * @return un objet AuthResponse contenant le token JWT
      */
     @Override
     public AuthResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         String token = jwtService.generateToken(authentication);
-        // Sauvegarder le token en BDD
+
         UserEntity user = userRepository.findByEmail(request.email()).orElseThrow();
+
         TokenEntity tokenEntity = new TokenEntity();
         tokenEntity.setToken(token);
         tokenEntity.setUser(user);
         tokenEntity.setCreatedAt(Instant.now());
         tokenEntity.setValid(true);
         tokenRepository.save(tokenEntity);
+
+        logger.debug("Token généré et enregistré en BDD pour l'utilisateur : {}", user.getEmail());
+
         return new AuthResponse(token);
     }
-
-    /**
-     * Enregistre un nouvel utilisateur après vérification de l'unicité de l'email.
-     *
-     * @param registerRequest Les données d'inscription (nom, email, mot de passe).
-     * @return Une réponse contenant un token JWT.
-     * @throws IllegalArgumentException si l'email est déjà utilisé.
-     */
+    // Méthode pour enregistrer un nouvel utilisateur
     @Override
     public AuthResponse register(RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
@@ -99,27 +95,24 @@ public class UserServiceImpl implements UserService {
         newUser.setCreated_at(LocalDateTime.now());
         newUser.setUpdated_at(LocalDateTime.now());
         userRepository.save(newUser);
+
         String token = jwtService.generateToken(
                 new UsernamePasswordAuthenticationToken(registerRequest.email(),
                         null,
                         Collections.singleton(new SimpleGrantedAuthority("USER"))));
-        // Sauvegarder le token en BDD
+
         TokenEntity tokenEntity = new TokenEntity();
         tokenEntity.setToken(token);
         tokenEntity.setUser(newUser);
         tokenEntity.setCreatedAt(Instant.now());
         tokenEntity.setValid(true);
         tokenRepository.save(tokenEntity);
+
+        logger.info("Nouvel utilisateur enregistré avec succès : {}", newUser.getEmail());
+
         return new AuthResponse(token);
     }
-
-    /**
-     * Récupère les informations de l'utilisateur actuellement authentifié.
-     *
-     * @param authentication L'objet d'authentification contenant l'email de l'utilisateur.
-     * @return Un {@link UserDto} représentant l'utilisateur connecté.
-     * @throws RuntimeException si l'utilisateur n'existe pas.
-     */
+    // Méthode pour récupérer l'utilisateur authentifié
     @Override
     public UserDto getAuthenticatedUser(Authentication authentication) {
         String email = authentication.getName();
@@ -127,34 +120,23 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User does not exist"));
         return userMapper.toDto(user);
     }
-
-    /**
-     * Récupère les informations d'un utilisateur par son identifiant.
-     *
-     * @param id L'identifiant de l'utilisateur.
-     * @return Un {@link UserDto} correspondant à l'utilisateur trouvé.
-     * @throws RuntimeException si l'utilisateur n'existe pas.
-     */
+    // Méthode pour récupérer un utilisateur par son ID
     @Override
     public UserDto getUserById(Integer id) {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User does not exist"));
         return userMapper.toDto(user);
     }
-    /**
-     * Invalide le token JWT courant en le marquant comme non valide dans la base de données.
-     *
-     * @param token Le token JWT à invalider.
-     */
+    // Méthode pour gérer la déconnexion de l'utilisateur
     @Override
     public void logout(String token) {
         tokenRepository.findByToken(token).ifPresentOrElse(tokenEntity -> {
-            System.out.println("[DEBUG] Token trouvé pour logout : " + tokenEntity.getToken());
+            logger.debug("Token trouvé pour logout : {}", tokenEntity.getToken());
             tokenEntity.setValid(false);
             tokenRepository.save(tokenEntity);
-            System.out.println("[DEBUG] Token mis à jour (valid = false)");
+            logger.debug("Token invalidé avec succès.");
         }, () -> {
-            System.out.println("[DEBUG] Token NON trouvé pour logout !");
+            logger.warn("Token NON trouvé lors du logout !");
         });
     }
 }
